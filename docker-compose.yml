@@ -1,0 +1,29 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: wishlist-app
+    environment:
+      - PYTHONPATH=/app
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app/
+    restart: unless-stopped
+    platform: linux/amd64
+
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    container_name: wishlist-test
+    environment:
+      - PYTHONPATH=/app
+    volumes:
+      - ./app:/app/
+    restart: unless-stopped
+    command: pytest --cov --cov-report=html --cov-fail-under=80 --cov-report xml:coverage.xml && coverage xml -o coverage.xml
+    profiles:
+      - tests
+    platform: linux/amd64
