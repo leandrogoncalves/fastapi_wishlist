@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, List
 from http import HTTPStatus
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
@@ -14,13 +14,23 @@ router = APIRouter(
 )
 
 
-@router.get("/customers")
-async def get_customers(customer_service: Annotated[CustomerService, Depends(CustomerService)]):
+@router.get("/customers",
+            description="Get all customers",
+            summary="Get all customers",
+            response_model=List[Customer]
+            )
+async def get_customers(
+    customer_service: Annotated[CustomerService, Depends(CustomerService)],
+    page: int = 1,
+) -> JSONResponse:
     try:
         all_customers = await customer_service.get_all()
         return JSONResponse(
             status_code=HTTPStatus.OK,
-            content={"customers": all_customers}
+            content={
+                "customers": all_customers,
+                "page": page
+            }
         )
     except Exception as e:
         logger.error(f"Error getting all customers: {e}")
@@ -30,21 +40,38 @@ async def get_customers(customer_service: Annotated[CustomerService, Depends(Cus
         )
 
 
-@router.get("/customers/{customer_id}")
+@router.get("/customers/{customer_id}",
+            description="Get customer by id or null",
+            summary="Get customer by id",
+            response_model=Customer
+            )
 async def get_customer_by_id(customer_id: int):
     return {'id': customer_id}
 
 
-@router.post("/customers")
+@router.post("/customers",
+            status_code=HTTPStatus.CREATED,
+            description="Create a new customer or fail",
+            summary="Create a new customer",
+            response_model=Customer
+            )
 async def create_customer(customer: Customer):
     return [{'id': 1}]
 
 
-@router.put("/customers/{customer_id}")
+@router.put("/customers/{customer_id}",
+            description="Update a customer by Id or fail",
+            summary="Update a customer by id",
+            response_model=Customer
+            )
 async def update_customer(customer_id: int, customer: Customer):
     return customer_id
 
 
-@router.delete("/customers/{customer_id}")
+@router.delete("/customers/{customer_id}",
+                description="Delete a customer or fail",
+                summary="Update a customer",
+                response_model=None
+                )
 async def delete_customer(customer_id: int):
     return {"id": customer_id}

@@ -7,6 +7,9 @@ class Customer(BaseModel):
     name: str
     email: str
 
+    class Confg:
+        orm_mode = True
+
     @field_validator('name')
     def validate_name(cls, value: str) -> str:
         if len(value) < 3:
