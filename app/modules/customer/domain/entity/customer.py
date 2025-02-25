@@ -2,6 +2,7 @@ from typing import Optional
 import re
 from pydantic import BaseModel, field_validator
 
+
 class Customer(BaseModel):
     id: Optional[int] = None
     name: str
@@ -15,7 +16,6 @@ class Customer(BaseModel):
         if len(value) < 3:
             raise ValueError("Name must be at least 3 characters long.")
         return value
-
 
     @field_validator('email')
     def validate_email(cls, value: str) -> str:

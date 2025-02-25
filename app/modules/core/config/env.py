@@ -1,12 +1,5 @@
 import os
 from dotenv import load_dotenv
-from pythondi import Provider
-from pythondi import configure
-
-from pydantic_settings import BaseSettings
-
-from modules.customer.domain.repository.database.customer_repository_abstract import CustomerRepositoryAbstract
-from modules.customer.infrastructure.repository.database.customer_repository import CustomerRepository
 
 load_dotenv()
 
@@ -32,16 +25,6 @@ POSTGRES_DB = os.environ.get("POSTGRES_DB")
 POSTGRES_HOST = os.environ.get("POSTGRES_HOST", default="localhost")
 POSTGRES_PORT = int(os.environ.get("POSTGRES_PORT", default=5432))
 
-provider = Provider()
-provider.bind(CustomerRepositoryAbstract, CustomerRepository)
+PAGE_SIZE = os.environ.get("PAGE_SIZE", default=10)
 
-configure(provider=provider)
 
-class Settings(BaseSettings):
-    API_STR: str = '/api'
-    DB_URL: str = f'postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}'
-
-    class Config:
-        case_sensitive = True
-
-settings: Settings = Settings()
