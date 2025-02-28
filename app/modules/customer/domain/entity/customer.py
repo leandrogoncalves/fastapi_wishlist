@@ -4,9 +4,11 @@ from pydantic import BaseModel, field_validator
 
 
 class Customer(BaseModel):
-    id: Optional[int] = None
+    id: Optional[str] = None
     name: str
     email: str
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None
 
     class Confg:
         orm_mode = True

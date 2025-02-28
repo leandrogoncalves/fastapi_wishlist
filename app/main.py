@@ -1,18 +1,27 @@
 from modules.core.config import env, dependencies
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 
-from modules.core.infrastructure.http.api import health_controller
-from modules.auth.infrastructure.http.api import auth_controller
-from modules.product.infrastructure.http.api import product_controller
-from modules.customer.infrastructure.http.api import customer_controller
-from modules.wishlist.infrastructure.http.api import wishlist_controller
+from modules.core.infrastructure.http.controller import health_controller
+from modules.auth.infrastructure.http.controller import auth_controller
+from modules.product.infrastructure.http.controller import product_controller
+from modules.customer.infrastructure.http.controller import customer_controller
+from modules.wishlist.infrastructure.http.controller import wishlist_controller
+
+
+@asynccontextmanager
+async def lifspan(app: FastAPI):
+    print('starting')
+    yield
+    print('stopping')
 
 app = FastAPI(
     redirect_slashes=False,
     name=env.APP_NAME,
     title=env.APP_TITLE,
     description=env.APP_DESCRIPTION,
+    lifespan=lifspan
 )
 
 app.add_middleware(

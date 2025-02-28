@@ -6,7 +6,7 @@ from sqlalchemy import Column, String
 class ProductModel(SQLModel, table=True):
     __tablename__: str = "products"
 
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: Optional[str] = Field(default=None, primary_key=True)
     title: str = Field(sa_column=Column(String(100), nullable=False))
     price: float = Field(default=None, nullable=False)
     brand: str = Field(sa_column=Column(String(100), nullable=False))

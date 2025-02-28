@@ -15,7 +15,7 @@ wishlist_product = Table(
 class WishlistModel(SQLModel, table=True):
     __tablename__: str = "wishlists"
 
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: Optional[str] = Field(default=None, primary_key=True)
     name: str = Field(sa_column=Column(String(100), nullable=True))
     created_at: Optional[datetime] = Field(default=None, nullable=True)
     updated_at: Optional[datetime] = Field(default=None, nullable=True)
