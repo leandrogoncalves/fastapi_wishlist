@@ -71,19 +71,19 @@ async def create_customer(
         customer_service: Annotated[CustomerService, Depends(CustomerService)],
         customer: Customer
 ) -> JSONResponse:
-    try:
+    # try:
         return await customer_service.store(customer)
-    except HTTPException as ehttp:
-        return JSONResponse(
-            status_code=ehttp.status_code,
-            content={"error": ehttp.detail}
-        )
-    except Exception as e:
-        logger.error(f"Error creating customer: {e}")
-        return JSONResponse(
-            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-            content={"error": "Internal Server Error"}
-        )
+    # except HTTPException as ehttp:
+    #     return JSONResponse(
+    #         status_code=ehttp.status_code,
+    #         content={"error": ehttp.detail}
+    #     )
+    # except Exception as e:
+    #     logger.error(f"Error creating customer: {e}")
+    #     return JSONResponse(
+    #         status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+    #         content={"error": "Internal Server Error"}
+    #     )
 
 
 @router.put("/customers/{customer_id}",

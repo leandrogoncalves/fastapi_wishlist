@@ -5,6 +5,7 @@ from zoneinfo import ZoneInfo
 from sqlmodel import select
 from sqlalchemy import func
 from fastapi import HTTPException
+from modules.core.config.env import DEFAULT_TINE_ZONE
 from modules.customer.domain.repository.database.customer_repository_abstract import CustomerRepositoryAbstract
 from modules.customer.infrastructure.database.models.customer_model import CustomerModel
 from modules.customer.domain.entity.customer import Customer
@@ -39,8 +40,8 @@ class CustomerRepository(CustomerRepositoryAbstract):
             id=str(uuid.uuid4()),
             name=customer.name,
             email=customer.email,
-            created_at=datetime.now(ZoneInfo("America/Sao_Paulo")),
-            updated_at=datetime.now(ZoneInfo("America/Sao_Paulo"))
+            created_at=datetime.now(ZoneInfo(DEFAULT_TINE_ZONE)),
+            updated_at=datetime.now(ZoneInfo(DEFAULT_TINE_ZONE))
         )
         async with get_session() as session:
             session.add(new_customer)
@@ -57,7 +58,7 @@ class CustomerRepository(CustomerRepositoryAbstract):
         async with get_session() as session:
             customer_founded.name = customer.name
             customer_founded.email = customer.email
-            customer_founded.updated_at = datetime.now()
+            customer_founded.updated_at = datetime.now(ZoneInfo(DEFAULT_TINE_ZONE))
             session.add(customer_founded)
             await session.commit()
             session.refresh(customer)

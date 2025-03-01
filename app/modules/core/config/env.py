@@ -29,5 +29,5 @@ POSTGRES_HOST = os.getenv("POSTGRES_HOST", default="localhost")
 POSTGRES_PORT = int(os.getenv("POSTGRES_PORT", default=5432))
 
 PAGE_SIZE = os.getenv("PAGE_SIZE", default=10)
-
+DEFAULT_TINE_ZONE = os.getenv("DEFAULT_TINE_ZONE", default="America/Sao_Paulo")
 

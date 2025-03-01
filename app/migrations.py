@@ -1,8 +1,5 @@
 from sqlmodel import SQLModel
-from modules.core.config.settings import settings
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine
-
-engine: AsyncEngine = create_async_engine(settings.DB_URL_MIGRATION, echo=True)
+from modules.core.config.database import engine
 
 async def create_tables() -> None:
     print('Creating tables...')

@@ -6,6 +6,7 @@ from pythondi import inject
 from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
 from modules.core.config.env import PAGE_SIZE
+from modules.core.config.env import DEFAULT_TINE_ZONE
 from modules.customer.domain.repository.database.customer_repository_abstract import CustomerRepositoryAbstract
 from modules.customer.infrastructure.database.models.customer_model import CustomerModel
 from modules.customer.domain.entity.customer import Customer
@@ -64,10 +65,10 @@ class CustomerService:
             id=customer_model.id,
             name=customer_model.name,
             email=customer_model.email,
-            created_at=customer_model.created_at.strftime("%d/%m/%Y %H:%M:%S")
+            created_at=customer_model.created_at.astimezone(ZoneInfo(DEFAULT_TINE_ZONE)).strftime("%d/%m/%Y %H:%M:%S")
                 if isinstance(customer_model.created_at, datetime)
                 else customer_model.created_at,
-            updated_at=customer_model.updated_at.strftime("%d/%m/%Y %H:%M:%S")
+            updated_at=customer_model.updated_at.astimezone(ZoneInfo(DEFAULT_TINE_ZONE)).strftime("%d/%m/%Y %H:%M:%S")
                 if isinstance(customer_model.updated_at, datetime)
                 else customer_model.updated_at,
         )
