@@ -1,4 +1,5 @@
 import uuid
+from typing import List
 from http import HTTPStatus
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -14,7 +15,7 @@ from modules.core.config.database import get_session
 
 class CustomerRepository(CustomerRepositoryAbstract):
 
-    async def get_all_customers(self, offset: int, limit: int) -> list:
+    async def get_all_customers(self, offset: int, limit: int) -> List[CustomerModel]:
         async with get_session() as session:
             query = select(CustomerModel).offset(offset).limit(limit)
             result = await session.execute(query)
@@ -28,14 +29,21 @@ class CustomerRepository(CustomerRepositoryAbstract):
             total = result.scalar_one()
             return total
 
-    async def get_by_id(self, customer_id):
+    async def get_by_id(self, customer_id: str) -> CustomerModel:
         async with get_session() as session:
             query = select(CustomerModel).filter(CustomerModel.id == customer_id)
             result = await session.execute(query)
             customer: CustomerModel = result.scalar_one_or_none()
             return customer
 
-    async def create(self, customer: Customer):
+    async def get_by_email(self, email: str) -> CustomerModel:
+        async with get_session() as session:
+            query = select(CustomerModel).filter(CustomerModel.email == email)
+            result = await session.execute(query)
+            customer: CustomerModel = result.scalar_one_or_none()
+            return customer
+
+    async def create(self, customer: Customer) -> CustomerModel:
         new_customer = CustomerModel(
             id=str(uuid.uuid4()),
             name=customer.name,
@@ -56,15 +64,16 @@ class CustomerRepository(CustomerRepositoryAbstract):
                 status_code=HTTPStatus.NOT_FOUND,
             )
         async with get_session() as session:
-            customer_founded.name = customer.name
-            customer_founded.email = customer.email
+            if customer.name:
+                customer_founded.name = customer.name
+            if customer.email:
+                customer_founded.email = customer.email
             customer_founded.updated_at = datetime.now(ZoneInfo(DEFAULT_TINE_ZONE))
             session.add(customer_founded)
             await session.commit()
-            session.refresh(customer)
             return customer_founded
 
-    async def delete(self, customer_id: str):
+    async def delete(self, customer_id: str) -> None:
         customer_founded = await self.get_by_id(customer_id)
         if customer_founded is None:
             raise HTTPException(

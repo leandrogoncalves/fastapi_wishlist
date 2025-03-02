@@ -9,7 +9,7 @@ class CustomerModel(SQLModel, table=True):
 
     id: Optional[str] = Field(default=None, primary_key=True)
     name: str = Field(sa_column=Column(String(100), nullable=False))
-    email: str = Field(sa_column=Column(String(100), nullable=False))
+    email: str = Field(sa_column=Column(String(100), nullable=False, unique=True))
     created_at: Optional[datetime] = Field(
         sa_column=Column(TIMESTAMP(timezone=True), nullable=True)
     )
