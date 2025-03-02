@@ -15,7 +15,7 @@ router = APIRouter(
 )
 
 
-@router.get("/products",
+@router.get("/product",
             description = "Get all products",
             summary = "Get all products",
             response_model = List[Product]
@@ -38,7 +38,7 @@ async def get_products(
         )
 
 
-@router.get("/products/{product_id}",
+@router.get("/product/{product_id}",
             description="Get product by id or null",
             summary="Get product by id",
             response_model=Product
@@ -50,7 +50,7 @@ async def get_product_by_id(
     try:
         return await product_service.get_by_id(product_id)
     except HTTPException as ehttp:
-        logger.error(f"Error creating product: {ehttp}")
+        logger.error(f"Error getting product: {ehttp}")
         return JSONResponse(
             status_code=ehttp.status_code,
             content={"error": ehttp.detail}
@@ -63,7 +63,7 @@ async def get_product_by_id(
         )
 
 
-@router.post("/products",
+@router.post("/product",
             status_code=HTTPStatus.CREATED,
             description="Create a new product or fail",
             summary="Create a new product",
@@ -89,7 +89,7 @@ async def create_product(
         )
 
 
-@router.put("/products/{product_id}",
+@router.put("/product/{product_id}",
             description="Update a product by Id or fail",
             summary="Update a product by id",
             response_model=Product
@@ -99,23 +99,23 @@ async def update_product(
         product_id: str,
         product: Product
 ) -> JSONResponse:
-    # try:
+    try:
         return await product_service.update(product_id, product)
-    # except HTTPException as ehttp:
-    #     logger.error(f"Error creating product: {ehttp}")
-    #     return JSONResponse(
-    #         status_code=ehttp.status_code,
-    #         content={"error": ehttp.detail}
-    #     )
-    # except Exception as e:
-    #     logger.error(f"Error updating product: {e}")
-    #     return JSONResponse(
-    #         status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-    #         content={"error": "Internal Server Error"}
-    #     )
+    except HTTPException as ehttp:
+        logger.error(f"Error updating product: {ehttp}")
+        return JSONResponse(
+            status_code=ehttp.status_code,
+            content={"error": ehttp.detail}
+        )
+    except Exception as e:
+        logger.error(f"Error updating product: {e}")
+        return JSONResponse(
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            content={"error": "Internal Server Error"}
+        )
 
 
-@router.delete("/products/{product_id}",
+@router.delete("/product/{product_id}",
                 description="Delete a product or fail",
                 summary="Update a product",
                 response_model=None
@@ -128,13 +128,13 @@ async def delete_product(
         await product_service.delete(product_id)
         return Response(status_code=HTTPStatus.NO_CONTENT)
     except HTTPException as ehttp:
-        logger.error(f"Error creating product: {ehttp}")
+        logger.error(f"Error deleting product: {ehttp}")
         return JSONResponse(
             status_code=ehttp.status_code,
             content={"error": ehttp.detail}
         )
     except Exception as e:
-        logger.error(f"Error getting all products: {e}")
+        logger.error(f"Error deleting all products: {e}")
         return JSONResponse(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             content={"error": "Internal Server Error"}

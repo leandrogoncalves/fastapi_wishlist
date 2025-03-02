@@ -48,22 +48,25 @@ class CustomerService:
         return self._get_customer(customer_model)
 
     async def store(self, customer: Customer) -> CustomerModel:
-        customer_model: CustomerModel = await self.repository.get_by_email(customer.email)
-        if isinstance(customer_model, CustomerModel):
-            raise HTTPException(
-                detail=f"Customer already exists with this email address: {customer.email}",
-                status_code=HTTPStatus.PRECONDITION_FAILED,
-            )
+        await self._validate_unique_email(customer)
         new_customer = await self.repository.create(customer)
         return self._get_customer(new_customer)
 
     async def update(self, customer_id: str, customer: Customer) -> Customer:
+        await self._validate_unique_email(customer)
         customer_updated = await self.repository.update(customer_id, customer)
         return self._get_customer(customer_updated)
 
     async def delete(self, customer_id: int) -> None:
         await self.repository.delete(customer_id)
 
+    async def _validate_unique_email(self, customer) -> None:
+        customer_model: CustomerModel = await self.repository.get_by_email(customer.email)
+        if isinstance(customer_model, CustomerModel):
+            raise HTTPException(
+                detail=f"Customer already exists with this email address: {customer.email}",
+                status_code=HTTPStatus.PRECONDITION_FAILED,
+            )
 
     def _get_customer(self, customer_model: CustomerModel) -> Customer:
         return Customer(

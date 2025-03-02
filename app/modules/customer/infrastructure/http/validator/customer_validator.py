@@ -7,8 +7,6 @@ def customer_validator(customer: Customer) -> Customer:
     fields = [
         'name',
         'email',
-        'price',
-        'image',
     ]
 
     for field in fields:

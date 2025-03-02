@@ -15,7 +15,7 @@ router = APIRouter(
 )
 
 
-@router.get("/customers",
+@router.get("/customer",
             description="Get all customers",
             summary="Get all customers",
             response_model=List[Customer]
@@ -38,7 +38,7 @@ async def get_customers(
         )
 
 
-@router.get("/customers/{customer_id}",
+@router.get("/customer/{customer_id}",
             description="Get customer by id or null",
             summary="Get customer by id",
             response_model=Customer
@@ -50,7 +50,7 @@ async def get_customer_by_id(
     try:
         return await customer_service.get_by_id(customer_id)
     except HTTPException as ehttp:
-        logger.error(f"Error creating customer: {ehttp}")
+        logger.error(f"Error getting customer: {ehttp}")
         return JSONResponse(
             status_code=ehttp.status_code,
             content={"error": ehttp.detail}
@@ -63,7 +63,7 @@ async def get_customer_by_id(
         )
 
 
-@router.post("/customers",
+@router.post("/customer",
             status_code=HTTPStatus.CREATED,
             description="Create a new customer or fail",
             summary="Create a new customer",
@@ -89,7 +89,7 @@ async def create_customer(
         )
 
 
-@router.put("/customers/{customer_id}",
+@router.put("/customer/{customer_id}",
             description="Update a customer by Id or fail",
             summary="Update a customer by id",
             response_model=Customer
@@ -102,7 +102,7 @@ async def update_customer(
     try:
         return await customer_service.update(customer_id, customer)
     except HTTPException as ehttp:
-        logger.error(f"Error creating customer: {ehttp}")
+        logger.error(f"Error updating customer: {ehttp}")
         return JSONResponse(
             status_code=ehttp.status_code,
             content={"error": ehttp.detail}
@@ -115,7 +115,7 @@ async def update_customer(
         )
 
 
-@router.delete("/customers/{customer_id}",
+@router.delete("/customer/{customer_id}",
                 description="Delete a customer or fail",
                 summary="Update a customer",
                 response_model=None
@@ -128,13 +128,13 @@ async def delete_customer(
         await customer_service.delete(customer_id)
         return Response(status_code=HTTPStatus.NO_CONTENT)
     except HTTPException as ehttp:
-        logger.error(f"Error creating customer: {ehttp}")
+        logger.error(f"Error deleting customer: {ehttp}")
         return JSONResponse(
             status_code=ehttp.status_code,
             content={"error": ehttp.detail}
         )
     except Exception as e:
-        logger.error(f"Error getting all customers: {e}")
+        logger.error(f"Error deleting all customers: {e}")
         return JSONResponse(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             content={"error": "Internal Server Error"}
