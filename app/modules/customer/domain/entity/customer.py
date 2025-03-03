@@ -7,6 +7,7 @@ class Customer(BaseModel):
     id: Optional[str] = None
     name: Optional[str] = None
     email: Optional[str] = None
+    wishlist_id: Optional[str] = None
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
 

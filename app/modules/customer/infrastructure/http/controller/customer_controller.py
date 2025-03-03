@@ -1,4 +1,4 @@
-from typing import Annotated, List
+from typing import Annotated, List, Union
 from http import HTTPStatus
 from fastapi import APIRouter, Depends, Query, Path, HTTPException, Response
 from fastapi.responses import JSONResponse
@@ -123,7 +123,7 @@ async def update_customer(
 async def delete_customer(
     customer_service: Annotated[CustomerService, Depends(CustomerService)],
     customer_id: str
-) -> Response:
+) -> Union[Response, JSONResponse]:
     try:
         await customer_service.delete(customer_id)
         return Response(status_code=HTTPStatus.NO_CONTENT)

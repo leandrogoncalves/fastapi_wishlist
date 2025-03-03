@@ -1,4 +1,4 @@
-from typing import Annotated, List
+from typing import Annotated, List, Union
 from http import HTTPStatus
 from fastapi import APIRouter, Depends, Query, Path, HTTPException, Response
 from fastapi.responses import JSONResponse
@@ -16,9 +16,9 @@ router = APIRouter(
 
 
 @router.get("/product",
-            description = "Get all products",
-            summary = "Get all products",
-            response_model = List[Product]
+            description="Get all products",
+            summary="Get all products",
+            response_model=List[Product]
 )
 async def get_products(
     product_service: Annotated[ProductService, Depends(ProductService)],
@@ -123,7 +123,7 @@ async def update_product(
 async def delete_product(
     product_service: Annotated[ProductService, Depends(ProductService)],
     product_id: str
-) -> Response:
+) -> Union[Response, JSONResponse]:
     try:
         await product_service.delete(product_id)
         return Response(status_code=HTTPStatus.NO_CONTENT)

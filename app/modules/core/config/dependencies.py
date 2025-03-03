@@ -1,13 +1,19 @@
 from pythondi import Provider
 from pythondi import configure
 
-from modules.customer.domain.repository.database.customer_repository_abstract import CustomerRepositoryAbstract
+from modules.shared.domain.repository.database.customer_repository_abstract import CustomerRepositoryAbstract
 from modules.customer.infrastructure.repository.database.customer_repository import CustomerRepository
-from modules.product.domain.repository.database.product_repository_abstract import ProductRepositoryAbstract
+from modules.shared.domain.repository.database.product_repository_abstract import ProductRepositoryAbstract
 from modules.product.infrastructure.repository.database.product_repository import ProductRepository
+from modules.wishlist.domain.repository.database.wishlist_repository_abstract import WishlistRepositoryAbstract
+from modules.wishlist.infrastructure.repository.database.wishlist_repository import WishlistRepository
+from modules.wishlist.domain.repository.database.wishlist_product_repository_abstract import WishlistProductRepositoryAbstract
+from modules.wishlist.infrastructure.repository.database.wishlist_product_repository import WishlistProductRepository
 
 provider = Provider()
 provider.bind(CustomerRepositoryAbstract, CustomerRepository)
 provider.bind(ProductRepositoryAbstract, ProductRepository)
+provider.bind(WishlistRepositoryAbstract, WishlistRepository)
+provider.bind(WishlistProductRepositoryAbstract, WishlistProductRepository)
 
 config = configure(provider=provider)

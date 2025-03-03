@@ -1,15 +1,11 @@
-import uuid
 from typing import List
-from http import HTTPStatus
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from sqlmodel import select
 from sqlalchemy import func
-from fastapi import HTTPException
 from modules.core.config.env import DEFAULT_TINE_ZONE
-from modules.customer.domain.repository.database.customer_repository_abstract import CustomerRepositoryAbstract
+from modules.shared.domain.repository.database.customer_repository_abstract import CustomerRepositoryAbstract
 from modules.customer.infrastructure.database.models.customer_model import CustomerModel
-from modules.customer.domain.entity.customer import Customer
 from modules.core.config.database import get_session
 
 
@@ -17,69 +13,47 @@ class CustomerRepository(CustomerRepositoryAbstract):
 
     async def get_all_customers(self, offset: int, limit: int) -> List[CustomerModel]:
         async with get_session() as session:
-            query = select(CustomerModel).offset(offset).limit(limit)
+            query = select(CustomerModel).offset(offset).where(CustomerModel.deleted_at.is_(None)).limit(limit)
             result = await session.execute(query)
-            customers = result.scalars().all()
-            return customers
+            return result.scalars().all()
 
     async def count(self) -> int:
         async with get_session() as session:
-            query = select(func.count()).select_from(CustomerModel)
+            query = select(func.count()).select_from(CustomerModel).where(CustomerModel.deleted_at.is_(None))
             result = await session.execute(query)
-            total = result.scalar_one()
-            return total
+            return result.scalar_one()
 
     async def get_by_id(self, customer_id: str) -> CustomerModel:
         async with get_session() as session:
-            query = select(CustomerModel).filter(CustomerModel.id == customer_id)
+            query = select(CustomerModel).where(
+                CustomerModel.id == customer_id,
+                CustomerModel.deleted_at.is_(None)
+            )
             result = await session.execute(query)
-            customer: CustomerModel = result.scalar_one_or_none()
-            return customer
+            return result.scalar_one_or_none()
 
     async def get_by_email(self, email: str) -> CustomerModel:
         async with get_session() as session:
-            query = select(CustomerModel).filter(CustomerModel.email == email)
+            query = select(CustomerModel).where(CustomerModel.email == email)
             result = await session.execute(query)
-            customer: CustomerModel = result.scalar_one_or_none()
-            return customer
+            return result.scalar_one_or_none()
 
-    async def create(self, customer: Customer) -> CustomerModel:
-        new_customer = CustomerModel(
-            id=str(uuid.uuid4()),
-            name=customer.name,
-            email=customer.email,
-            created_at=datetime.now(ZoneInfo(DEFAULT_TINE_ZONE)),
-            updated_at=datetime.now(ZoneInfo(DEFAULT_TINE_ZONE))
-        )
+    async def create(self, new_customer: CustomerModel) -> CustomerModel:
         async with get_session() as session:
             session.add(new_customer)
             await session.commit()
             return new_customer
 
-    async def update(self, customer_id: str, customer: Customer) -> CustomerModel:
-        customer_founded = await self.get_by_id(customer_id)
-        if customer_founded is None:
-            raise HTTPException(
-                detail="Customer Not Found",
-                status_code=HTTPStatus.NOT_FOUND,
-            )
+    async def update(self, customer_founded: CustomerModel) -> CustomerModel:
         async with get_session() as session:
-            if customer.name:
-                customer_founded.name = customer.name
-            if customer.email:
-                customer_founded.email = customer.email
             customer_founded.updated_at = datetime.now(ZoneInfo(DEFAULT_TINE_ZONE))
             session.add(customer_founded)
             await session.commit()
             return customer_founded
 
-    async def delete(self, customer_id: str) -> None:
-        customer_founded = await self.get_by_id(customer_id)
-        if customer_founded is None:
-            raise HTTPException(
-                detail="Customer Not Found",
-                status_code=HTTPStatus.NOT_FOUND,
-            )
+    async def delete(self, customer_founded: CustomerModel) -> None:
         async with get_session() as session:
-            await session.delete(customer_founded)
+            customer_founded.deleted_at = datetime.now(ZoneInfo(DEFAULT_TINE_ZONE))
+            session.add(customer_founded)
+            # await session.delete(customer_founded)
             await session.commit()

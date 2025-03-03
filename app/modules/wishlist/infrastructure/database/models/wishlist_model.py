@@ -1,7 +1,7 @@
 from typing import Optional
 from datetime import datetime
 from sqlmodel import Field, SQLModel
-from sqlalchemy import Table, Column, String, ForeignKey
+from sqlalchemy import Table, Column, String, ForeignKey, TIMESTAMP
 
 
 wishlist_product = Table(
@@ -17,6 +17,9 @@ class WishlistModel(SQLModel, table=True):
 
     id: Optional[str] = Field(default=None, primary_key=True)
     name: str = Field(sa_column=Column(String(100), nullable=True))
-    created_at: Optional[datetime] = Field(default=None, nullable=True)
-    updated_at: Optional[datetime] = Field(default=None, nullable=True)
-    deleted_at: Optional[datetime] = Field(default=None, nullable=True)
+    created_at: Optional[datetime] = Field(
+        sa_column=Column(TIMESTAMP(timezone=True), nullable=True)
+    )
+    updated_at: Optional[datetime] = Field(
+        sa_column=Column(TIMESTAMP(timezone=True), nullable=True)
+    )
