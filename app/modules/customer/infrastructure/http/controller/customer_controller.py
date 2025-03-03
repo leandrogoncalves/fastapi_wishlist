@@ -4,8 +4,8 @@ from fastapi import APIRouter, Depends, Query, Path, HTTPException, Response
 from fastapi.responses import JSONResponse
 from modules.core.helpers.config_logger import get_logger
 from modules.customer.application.service.customer_service import CustomerService
-from modules.customer.domain.entity.customer import Customer
-from modules.customer.infrastructure.http.validator.customer_validator import customer_validator
+from modules.customer.domain.entity.customer import Customer, CustomerUp
+from modules.customer.domain.entity.customer_filtered import CustomerFiltered
 
 logger = get_logger()
 
@@ -18,7 +18,7 @@ router = APIRouter(
 @router.get("/customer",
             description="Get all customers",
             summary="Get all customers",
-            response_model=List[Customer]
+            response_model=List[CustomerFiltered]
             )
 async def get_customers(
     customer_service: Annotated[CustomerService, Depends(CustomerService)],
@@ -41,7 +41,7 @@ async def get_customers(
 @router.get("/customer/{customer_id}",
             description="Get customer by id or null",
             summary="Get customer by id",
-            response_model=Customer
+            response_model=CustomerFiltered
             )
 async def get_customer_by_id(
         customer_service: Annotated[CustomerService, Depends(CustomerService)],
@@ -67,37 +67,37 @@ async def get_customer_by_id(
             status_code=HTTPStatus.CREATED,
             description="Create a new customer or fail",
             summary="Create a new customer",
-            response_model=Customer
+            response_model=CustomerFiltered
             )
 async def create_customer(
         customer_service: Annotated[CustomerService, Depends(CustomerService)],
-        customer: Customer = Depends(customer_validator)
+        customer: Customer
 ) -> JSONResponse:
-    try:
+    # try:
         return await customer_service.store(customer)
-    except HTTPException as ehttp:
-        logger.error(f"Error creating customer: {ehttp}")
-        return JSONResponse(
-            status_code=ehttp.status_code,
-            content={"error": ehttp.detail}
-        )
-    except Exception as e:
-        logger.error(f"Error creating customer: {e}")
-        return JSONResponse(
-            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-            content={"error": "Internal Server Error"}
-        )
+    # except HTTPException as ehttp:
+    #     logger.error(f"Error creating customer: {ehttp}")
+    #     return JSONResponse(
+    #         status_code=ehttp.status_code,
+    #         content={"error": ehttp.detail}
+    #     )
+    # except Exception as e:
+    #     logger.error(f"Error creating customer: {e}")
+    #     return JSONResponse(
+    #         status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+    #         content={"error": "Internal Server Error"}
+    #     )
 
 
 @router.put("/customer/{customer_id}",
             description="Update a customer by Id or fail",
             summary="Update a customer by id",
-            response_model=Customer
+            response_model=CustomerFiltered
             )
 async def update_customer(
         customer_service: Annotated[CustomerService, Depends(CustomerService)],
         customer_id: str,
-        customer: Customer
+        customer: CustomerUp
 ) -> JSONResponse:
     try:
         return await customer_service.update(customer_id, customer)

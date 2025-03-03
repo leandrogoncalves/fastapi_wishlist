@@ -1,6 +1,6 @@
 from typing import Optional
 from datetime import datetime
-from sqlmodel import SQLModel, Field, Relationship
+from sqlmodel import SQLModel, Field, Boolean, Relationship
 from sqlalchemy import Column, String, TIMESTAMP
 from modules.wishlist.infrastructure.database.models.wishlist_model import WishlistModel
 
@@ -9,7 +9,9 @@ class CustomerModel(SQLModel, table=True):
 
     id: Optional[str] = Field(default=None, primary_key=True)
     name: str = Field(sa_column=Column(String(100), nullable=False))
-    email: str = Field(sa_column=Column(String(100), nullable=False, unique=True))
+    email: str = Field(sa_column=Column(String(100), index=True, nullable=False, unique=True))
+    password: str = Field(sa_column=Column(String(100), nullable=False))
+    is_admin: bool = Field(sa_column=Column(Boolean, default=False))
     created_at: Optional[datetime] = Field(
         sa_column=Column(TIMESTAMP(timezone=True), nullable=True)
     )

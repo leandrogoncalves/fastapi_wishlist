@@ -4,8 +4,7 @@ from fastapi import APIRouter, Depends, Query, Path, HTTPException, Response
 from fastapi.responses import JSONResponse
 from modules.core.helpers.config_logger import get_logger
 from modules.product.application.service.product_service import ProductService
-from modules.product.domain.entity.product import Product
-from modules.product.infrastructure.http.validator.product_validator import product_validator
+from modules.product.domain.entity.product import Product, ProductUp
 
 logger = get_logger()
 
@@ -71,7 +70,7 @@ async def get_product_by_id(
 )
 async def create_product(
         product_service: Annotated[ProductService, Depends(ProductService)],
-        product: Product = Depends(product_validator)
+        product: Product
 ) -> JSONResponse:
     try:
         return await product_service.store(product)
@@ -97,7 +96,7 @@ async def create_product(
 async def update_product(
         product_service: Annotated[ProductService, Depends(ProductService)],
         product_id: str,
-        product: Product
+        product: ProductUp
 ) -> JSONResponse:
     try:
         return await product_service.update(product_id, product)

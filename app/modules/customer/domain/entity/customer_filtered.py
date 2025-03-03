@@ -3,13 +3,10 @@ import re
 from pydantic import BaseModel, field_validator
 
 
-class Customer(BaseModel):
-    id: str = None
-    name: str
-    email: str
-    password: str
-    wishlist_id: Optional[str] = None
-    is_admin: Optional[bool] = False
+class CustomerFiltered(BaseModel):
+    id: Optional[str] = None
+    name: Optional[str] = None
+    email: Optional[str] = None
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
 
@@ -28,11 +25,3 @@ class Customer(BaseModel):
             raise ValueError("Invalid email address.")
         return value
 
-
-class CustomerUp(Customer):
-    id: Optional[str] = None
-    name: Optional[str] = None
-    email: Optional[str] = None
-    password: Optional[str] = None
-    wishlist_id: Optional[str] = None
-    is_admin: Optional[bool] = None
