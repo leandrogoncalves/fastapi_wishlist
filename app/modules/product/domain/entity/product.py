@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, HttpUrl
 
 
 class Product(BaseModel):
@@ -7,7 +7,7 @@ class Product(BaseModel):
     title: str
     brand: str
     price: float
-    image: Optional[str] = None
+    image: Optional[HttpUrl] = None
     reviewScore: Optional[int] = None
     created_at: Optional[str] = None
     updated_at: Optional[str] = None

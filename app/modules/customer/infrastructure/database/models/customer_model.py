@@ -10,8 +10,8 @@ class CustomerModel(SQLModel, table=True):
     id: Optional[str] = Field(default=None, primary_key=True)
     name: str = Field(sa_column=Column(String(100), nullable=False))
     email: str = Field(sa_column=Column(String(100), index=True, nullable=False, unique=True))
-    password: str = Field(sa_column=Column(String(100), nullable=False))
-    is_admin: bool = Field(sa_column=Column(Boolean, default=False))
+    password: str = Field(sa_column=Column(String(100), nullable=True))
+    profile: bool = Field(sa_column=Column(String(50), default="viewer"))
     created_at: Optional[datetime] = Field(
         sa_column=Column(TIMESTAMP(timezone=True), nullable=True)
     )

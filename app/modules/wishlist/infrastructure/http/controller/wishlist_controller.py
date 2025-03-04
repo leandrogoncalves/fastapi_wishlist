@@ -1,14 +1,16 @@
 from typing import Annotated, Union
 from http import HTTPStatus
-from fastapi import APIRouter, Depends, Path, HTTPException, Response
+from fastapi import APIRouter, Depends, Path, HTTPException, Response, Request, Security
 from fastapi.responses import JSONResponse
+from fastapi.security import HTTPBearer
 from modules.core.helpers.config_logger import get_logger
 from modules.wishlist.application.service.wishlist_service import WishlistService
 from modules.wishlist.domain.entity.wishlist_product_list import WishlistProductList
 from modules.wishlist.infrastructure.http.validator.wishlist_validator import wishlist_validator
 
-
 logger = get_logger()
+
+bearer_scheme = HTTPBearer()
 
 router = APIRouter(
     prefix="/api",
@@ -16,9 +18,11 @@ router = APIRouter(
 )
 
 
-@router.get("/customer/{customer_id}/wishlist",
+@router.get(
+    path="/customer/{customer_id}/wishlist",
     description="Get wishlist by customer id",
     summary="Get wishlist by customer id",
+    dependencies=[Security(bearer_scheme)]
 )
 async def get_wishlist_by_customer_id(
     wishlist_service: Annotated[WishlistService, Depends(WishlistService)],
@@ -43,17 +47,23 @@ async def get_wishlist_by_customer_id(
         )
 
 
-@router.post("/customer/{customer_id}/wishlist",
+@router.post(
+    path="/customer/{customer_id}/wishlist",
     description="Get wishlist by customer id",
     summary="Get wishlist by customer id",
-    response_model=None
+    response_model=None,
+    dependencies=[Security(bearer_scheme)]
 )
 async def set_wishlist_by_customer_id(
+    request: Request,
     wishlist_service: Annotated[WishlistService, Depends(WishlistService)],
     customer_id: str = Path(title="Customer Id", description="Customer Id"),
     wishlist_products: WishlistProductList = Depends(wishlist_validator)
 ) -> Union[Response, JSONResponse]:
     try:
+        if request.state.user.profile != "admin":
+            raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail="Forbidden")
+
         await wishlist_service.set_by_customer_id(customer_id, wishlist_products)
         return Response(status_code=HTTPStatus.NO_CONTENT)
     except HTTPException as ehttp:
@@ -69,17 +79,23 @@ async def set_wishlist_by_customer_id(
             content={"error": "Internal Server Error"}
         )
 
-@router.delete("/customer/{customer_id}/wishlist",
+@router.delete(
+    path="/customer/{customer_id}/wishlist",
     description="Remove product from wishlist by customer id",
     summary="Remove product from wishlist by customer id",
-    response_model=None
+    response_model=None,
+    dependencies=[Security(bearer_scheme)]
 )
-async def set_wishlist_by_customer_id(
+async def remove_wishlist_by_customer_id(
+    request: Request,
     wishlist_service: Annotated[WishlistService, Depends(WishlistService)],
     customer_id: str = Path(title="Customer Id", description="Customer Id"),
     wishlist_products: WishlistProductList = Depends(wishlist_validator)
 ) -> Union[Response, JSONResponse]:
     try:
+        if request.state.user.profile != "admin":
+            raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail="Forbidden")
+
         await wishlist_service.remove_by_customer_id(customer_id, wishlist_products)
         return Response(status_code=HTTPStatus.NO_CONTENT)
     except HTTPException as ehttp:

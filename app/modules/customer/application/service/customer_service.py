@@ -81,7 +81,8 @@ class CustomerService():
             id=str(uuid.uuid4()),
             name=customer.name,
             email=customer.email,
-            password=generate_password_hash(customer.password),
+            profile=customer.profile if customer.profile else "viewer",
+            password=generate_password_hash(customer.password) if customer.password else None,
             created_at=datetime.now(ZoneInfo(DEFAULT_TINE_ZONE)),
             updated_at=datetime.now(ZoneInfo(DEFAULT_TINE_ZONE))
         )
@@ -97,8 +98,8 @@ class CustomerService():
             customer_founded.email = customer.email
         if customer.password:
             customer_founded.password = generate_password_hash(customer.password)
-        if customer.is_admin is not None:
-            customer_founded.is_admin = bool(customer.is_admin)
+        if customer.profile:
+            customer_founded.is_aprofiledmin = customer.profile
         customer_updated = await self.repository.update(customer_founded)
         return self._get_customer_filtered(customer_updated)
 

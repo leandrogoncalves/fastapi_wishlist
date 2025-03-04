@@ -19,7 +19,7 @@ oauth2_schema = OAuth2PasswordBearer(
 
 
 class TokenData(BaseModel):
-    username = Optional[str] = None
+    username: Optional[str] = None
 
 
 async def authenticate(email: EmailStr, password: str, db: AsyncSession) -> Optional[CustomerModel]:

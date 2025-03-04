@@ -2,12 +2,8 @@ from modules.core.config import env, dependencies
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-
-from modules.core.infrastructure.http.controller import health_controller
-from modules.auth.infrastructure.http.controller import auth_controller
-from modules.product.infrastructure.http.controller import product_controller
-from modules.customer.infrastructure.http.controller import customer_controller
-from modules.wishlist.infrastructure.http.controller import wishlist_controller
+from modules.core.config.routes import api_router
+from modules.auth.infrastructure.http.middleware.jwt_auth_middleware import JWTAuthMiddleware
 
 
 @asynccontextmanager
@@ -24,6 +20,7 @@ app = FastAPI(
     lifespan=lifspan
 )
 
+app.add_middleware(JWTAuthMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[env.CORS_ALLOW_ORIGINS],
@@ -32,11 +29,7 @@ app.add_middleware(
     allow_headers=[env.CORS_ALLOW_HEADERS],
 )
 
-app.include_router(health_controller.router)
-app.include_router(auth_controller.router)
-app.include_router(product_controller.router)
-app.include_router(customer_controller.router)
-app.include_router(wishlist_controller.router)
+app.include_router(api_router)
 
 if __name__ == '__main__':
     import uvicorn

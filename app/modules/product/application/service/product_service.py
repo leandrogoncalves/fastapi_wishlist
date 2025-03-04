@@ -70,7 +70,7 @@ class ProductService:
             title=product.title,
             brand=product.brand,
             price=product.price,
-            image=product.image,
+            image=str(product.image),
             review_score=product.reviewScore,
             created_at=datetime.now(ZoneInfo(DEFAULT_TINE_ZONE)),
             updated_at=datetime.now(ZoneInfo(DEFAULT_TINE_ZONE))
@@ -87,7 +87,7 @@ class ProductService:
         if product.price:
             product_founded.price = product.price
         if product.image:
-            product_founded.image = product.image
+            product_founded.image = str(product.image)
         if product.reviewScore:
             product_founded.review_score = product.reviewScore
         return self._get_product(await self.repository.update(product_founded))

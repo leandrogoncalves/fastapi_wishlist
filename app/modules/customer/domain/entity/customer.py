@@ -4,12 +4,12 @@ from pydantic import BaseModel, field_validator
 
 
 class Customer(BaseModel):
-    id: str = None
+    id: Optional[str] = None
     name: str
     email: str
-    password: str
+    password: Optional[str] = None
     wishlist_id: Optional[str] = None
-    is_admin: Optional[bool] = False
+    profile: Optional[str] = False
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
 
@@ -35,4 +35,4 @@ class CustomerUp(Customer):
     email: Optional[str] = None
     password: Optional[str] = None
     wishlist_id: Optional[str] = None
-    is_admin: Optional[bool] = None
+    profile: Optional[str] = None
