@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from modules.core.config.auth import authenticate, create_access_token
 from modules.core.config.database import get_session
-
+from modules.auth.domain.entity.authorization import Authorization
 
 router = APIRouter(
     prefix="/api",
@@ -16,6 +16,7 @@ router = APIRouter(
 @router.post("/auth/login",
     description="Customer authentication",
     summary="Login",
+    response_model=Authorization
 )
 async def handle_login(
     form_data: OAuth2PasswordRequestForm = Depends(),
@@ -27,9 +28,9 @@ async def handle_login(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
     return JSONResponse(
-        content={
-            "access_token": create_access_token(subject=customer.id),
-            "token_type": "bearer",
-        },
+        content=Authorization(
+            access_token=create_access_token(subject=customer.id),
+            token_type="bearer",
+        ).to_dict(),
         status_code=status.HTTP_200_OK
     )

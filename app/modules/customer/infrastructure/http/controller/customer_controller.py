@@ -87,7 +87,7 @@ async def create_customer(
     customer_service: Annotated[CustomerService, Depends(CustomerService)],
     customer: Customer
 ) -> JSONResponse:
-    try:
+    # try:
         if request.state.user.profile != "admin":
             raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail="Forbidden")
 
@@ -96,18 +96,18 @@ async def create_customer(
             status_code=HTTPStatus.CREATED,
             content=response.to_dict()
         )
-    except HTTPException as ehttp:
-        logger.error(f"Error creating customer: {ehttp}")
-        return JSONResponse(
-            status_code=ehttp.status_code,
-            content={"error": ehttp.detail}
-        )
-    except Exception as e:
-        logger.error(f"Error creating customer: {e}")
-        return JSONResponse(
-            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-            content={"error": "Internal Server Error"}
-        )
+    # except HTTPException as ehttp:
+    #     logger.error(f"Error creating customer: {ehttp}")
+    #     return JSONResponse(
+    #         status_code=ehttp.status_code,
+    #         content={"error": ehttp.detail}
+    #     )
+    # except Exception as e:
+    #     logger.error(f"Error creating customer: {e}")
+    #     return JSONResponse(
+    #         status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+    #         content={"error": "Internal Server Error"}
+    #     )
 
 
 @router.put(

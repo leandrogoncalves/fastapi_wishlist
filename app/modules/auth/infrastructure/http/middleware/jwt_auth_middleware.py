@@ -10,7 +10,7 @@ from modules.customer.infrastructure.database.models.customer_model import Custo
 
 class JWTAuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint):
-        if request.url.path in ["/api/auth/login", "/docs", "/openapi.json", "/health"]:
+        if request.url.path in ["/api/auth/login", "/docs", "/openapi.json", "/health", "/"]:
             return await call_next(request)
 
         credential_exception: HTTPException = HTTPException(
