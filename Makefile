@@ -1,6 +1,6 @@
 start:
 	docker compose up -d
-	docker exec -it ms-ia-chatbot cp .env.example .env
+	docker exec -it wishlist-app cp .env.example .env
 
 run-tests:
 	docker compose up test --abort-on-container-exit --exit-code-from test

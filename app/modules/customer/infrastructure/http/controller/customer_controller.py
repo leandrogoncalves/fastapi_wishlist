@@ -55,7 +55,11 @@ async def get_customer_by_id(
     customer_id: str = Path(title="Customer Id", description="Customer Id")
 ) -> JSONResponse:
     try:
-        return await customer_service.get_by_id(customer_id)
+        response = await customer_service.get_by_id(customer_id)
+        return JSONResponse(
+            status_code=HTTPStatus.OK,
+            content=response.to_dict()
+        )
     except HTTPException as ehttp:
         logger.error(f"Error getting customer: {ehttp}")
         return JSONResponse(
@@ -87,7 +91,11 @@ async def create_customer(
         if request.state.user.profile != "admin":
             raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail="Forbidden")
 
-        return await customer_service.store(customer)
+        response = await customer_service.store(customer)
+        return JSONResponse(
+            status_code=HTTPStatus.CREATED,
+            content=response.to_dict()
+        )
     except HTTPException as ehttp:
         logger.error(f"Error creating customer: {ehttp}")
         return JSONResponse(
@@ -118,8 +126,11 @@ async def update_customer(
     try:
         if request.state.user.profile != "admin":
             raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail="Forbidden")
-
-        return await customer_service.update(customer_id, customer)
+        response = await customer_service.update(customer_id, customer)
+        return JSONResponse(
+            status_code=HTTPStatus.OK,
+            content=response.to_dict()
+        )
     except HTTPException as ehttp:
         logger.error(f"Error updating customer: {ehttp}")
         return JSONResponse(

@@ -54,7 +54,11 @@ async def get_product_by_id(
     product_id: str = Path(title="Product Id", description="Product Id")
 ) -> JSONResponse:
     try:
-        return await product_service.get_by_id(product_id)
+        result = await product_service.get_by_id(product_id)
+        return JSONResponse(
+            status_code=HTTPStatus.OK,
+            content=result.to_dict()
+        )
     except HTTPException as ehttp:
         logger.error(f"Error getting product: {ehttp}")
         return JSONResponse(
@@ -86,7 +90,11 @@ async def create_product(
         if request.state.user.profile != "admin":
             raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail="Forbidden")
 
-        return await product_service.store(product)
+        result = await product_service.store(product)
+        return JSONResponse(
+            status_code=HTTPStatus.OK,
+            content=result.to_dict()
+        )
     except HTTPException as ehttp:
         logger.error(f"Error creating product: {ehttp}")
         return JSONResponse(
@@ -118,7 +126,11 @@ async def update_product(
         if request.state.user.profile != "admin":
             raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail="Forbidden")
 
-        return await product_service.update(product_id, product)
+        result = await product_service.update(product_id, product)
+        return JSONResponse(
+            status_code=HTTPStatus.OK,
+            content=result.to_dict()
+        )
     except HTTPException as ehttp:
         logger.error(f"Error updating product: {ehttp}")
         return JSONResponse(

@@ -56,15 +56,21 @@ class JWTAuthMiddleware(BaseHTTPMiddleware):
                 status_code=status.HTTP_401_UNAUTHORIZED
             )
 
-        async with get_session() as session:
-            query = select(CustomerModel).filter(CustomerModel.id == username)
-            result = await session.execute(query)
-            customer: CustomerModel = result.scalars().unique().one_or_none()
+        try:
+            async with get_session() as session:
+                query = select(CustomerModel).filter(CustomerModel.id == username)
+                result = await session.execute(query)
+                customer: CustomerModel = result.scalars().unique().one_or_none()
 
-            if customer is None:
-                raise credential_exception
+                if customer is None:
+                    raise credential_exception
 
-            request.state.user = customer
+                request.state.user = customer
+        except HTTPException as e:
+            return JSONResponse(
+                content={"detail": e.detail},
+                status_code=status.HTTP_401_UNAUTHORIZED
+            )
 
         response = await call_next(request)
         return response
