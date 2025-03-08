@@ -19,13 +19,13 @@ from modules.customer.domain.entity.customer_paginated import CustomerPaginated
 class CustomerService():
 
     def __init__(self):
-        self.repository = self._get_customer_repository()
+        self.repository = self.__get_customer_repository()
 
     @inject()
-    def _get_customer_repository(self, repository: CustomerRepositoryAbstract):
+    def __get_customer_repository(self, repository: CustomerRepositoryAbstract):
         return repository
 
-    async def _validate_unique_email(self, customer) -> None:
+    async def __validate_unique_email(self, customer) -> None:
         customer_model: CustomerModel = await self.repository.get_by_email(customer.email)
         if isinstance(customer_model, CustomerModel):
             raise HTTPException(
@@ -33,7 +33,7 @@ class CustomerService():
                 status_code=HTTPStatus.PRECONDITION_FAILED,
             )
 
-    def _get_customer_filtered(self, customer_model: CustomerModel) -> CustomerFiltered:
+    def __get_customer_filtered(self, customer_model: CustomerModel) -> CustomerFiltered:
         return CustomerFiltered(
             id=customer_model.id,
             name=customer_model.name,
@@ -46,7 +46,7 @@ class CustomerService():
                 else customer_model.updated_at,
         )
 
-    def _validate_customer(self, customer_model: CustomerModel) -> None:
+    def __validate_customer(self, customer_model: CustomerModel) -> None:
         if customer_model is None:
             raise HTTPException(
                 detail="Customer Not Found",
@@ -58,7 +58,7 @@ class CustomerService():
         total_pages = round(total / PAGE_SIZE)
         offset = (page - 1) * PAGE_SIZE
         data = await self.repository.get_all_customers(offset, PAGE_SIZE)
-        customer_data = [self._get_customer_filtered(customer) for customer in data]
+        customer_data = [self.__get_customer_filtered(customer) for customer in data]
         return CustomerPaginated(
             page=page,
             total_pages=total_pages or 1,
@@ -72,11 +72,11 @@ class CustomerService():
 
     async def get_by_id(self, customer_id: str) -> Optional[CustomerFiltered]:
         customer_model: CustomerModel = await self.repository.get_by_id(customer_id)
-        self._validate_customer(customer_model)
-        return self._get_customer_filtered(customer_model)
+        self.__validate_customer(customer_model)
+        return self.__get_customer_filtered(customer_model)
 
     async def store(self, customer: Customer) -> CustomerFiltered:
-        await self._validate_unique_email(customer)
+        await self.__validate_unique_email(customer)
         new_customer = CustomerModel(
             id=str(uuid.uuid4()),
             name=customer.name,
@@ -86,12 +86,12 @@ class CustomerService():
             created_at=datetime.now(ZoneInfo(DEFAULT_TINE_ZONE)),
             updated_at=datetime.now(ZoneInfo(DEFAULT_TINE_ZONE))
         )
-        return self._get_customer_filtered(await self.repository.create(new_customer))
+        return self.__get_customer_filtered(await self.repository.create(new_customer))
 
     async def update(self, customer_id: str, customer: Customer) -> CustomerFiltered:
         customer_founded: CustomerModel = await self.repository.get_by_id(customer_id)
-        self._validate_customer(customer_founded)
-        await self._validate_unique_email(customer)
+        self.__validate_customer(customer_founded)
+        await self.__validate_unique_email(customer)
         if customer.name:
             customer_founded.name = customer.name
         if customer.email:
@@ -101,9 +101,9 @@ class CustomerService():
         if customer.profile:
             customer_founded.is_aprofiledmin = customer.profile
         customer_updated = await self.repository.update(customer_founded)
-        return self._get_customer_filtered(customer_updated)
+        return self.__get_customer_filtered(customer_updated)
 
     async def delete(self, customer_id: int) -> None:
         customer_model: CustomerModel = await self.repository.get_by_id(customer_id)
-        self._validate_customer(customer_model)
+        self.__validate_customer(customer_model)
         await self.repository.delete(customer_model)

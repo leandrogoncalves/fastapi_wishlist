@@ -17,28 +17,28 @@ from modules.product.domain.entity.product import Product
 
 class WishlistService:
     def __init__(self):
-        self.wishlist_repository = self._get_wishlist_repository()
-        self.wishlist_product_repository = self._get_wishlist_product_repository()
-        self.customer_repository = self._get_customer_repository()
-        self.product_repository = self._get_product_repository()
+        self.wishlist_repository = self.__get_wishlist_repository()
+        self.wishlist_product_repository = self.__get_wishlist_product_repository()
+        self.customer_repository = self.__get_customer_repository()
+        self.product_repository = self.__get_product_repository()
 
     @inject()
-    def _get_wishlist_repository(self, wishlist_repository: WishlistRepositoryAbstract):
+    def __get_wishlist_repository(self, wishlist_repository: WishlistRepositoryAbstract):
         return wishlist_repository
 
     @inject()
-    def _get_wishlist_product_repository(self, wishlist_product_repository: WishlistProductRepositoryAbstract):
+    def __get_wishlist_product_repository(self, wishlist_product_repository: WishlistProductRepositoryAbstract):
         return wishlist_product_repository
 
     @inject()
-    def _get_customer_repository(self, customer_repository: CustomerRepositoryAbstract):
+    def __get_customer_repository(self, customer_repository: CustomerRepositoryAbstract):
         return customer_repository
 
     @inject()
-    def _get_product_repository(self, product_repository: ProductRepositoryAbstract):
+    def __get_product_repository(self, product_repository: ProductRepositoryAbstract):
         return product_repository
 
-    async def _get_customer_by_id(self, customer_id: str) -> CustomerModel:
+    async def __get_customer_by_id(self, customer_id: str) -> CustomerModel:
         customer = await self.customer_repository.get_by_id(customer_id)
         if customer is None:
             raise HTTPException(
@@ -47,10 +47,10 @@ class WishlistService:
             )
         return customer
 
-    def _get_wishlist_name(self, customer: CustomerModel) -> str:
+    def __get_wishlist_name(self, customer: CustomerModel) -> str:
         return f"wishlist_%s" % customer.id
 
-    def _get_product_from_model(self, product_model: ProductModel) -> Product:
+    def __get_product_from_model(self, product_model: ProductModel) -> Product:
         return Product(
             id=product_model.id,
             title=product_model.title,
@@ -66,7 +66,7 @@ class WishlistService:
             else product_model.updated_at,
         )
 
-    async def _add_products_to_wishlist(self, wishlist_id: str, wishlist: WishlistProductList):
+    async def __add_products_to_wishlist(self, wishlist_id: str, wishlist: WishlistProductList) -> None:
         for product_id in wishlist.products:
             product = await self.product_repository.get_by_id(product_id)
             if not product:
@@ -77,7 +77,7 @@ class WishlistService:
             await self.wishlist_product_repository.add_product(wishlist_id, product_id)
 
     async def get_by_customer_id(self, customer_id: str) -> dict:
-        customer = await self._get_customer_by_id(customer_id)
+        customer = await self.__get_customer_by_id(customer_id)
         if customer.wishlist_id is None:
             raise HTTPException(
                 detail="Customer has no wishlist. Add products to create a wishlist",
@@ -85,14 +85,14 @@ class WishlistService:
             )
         products_list = await self.wishlist_product_repository.get_products_by_wishlist_id(customer.wishlist_id)
         wishlist_products = [
-            self._get_product_from_model(product_model[0]) for product_model in products_list
+            self.__get_product_from_model(product_model[0]) for product_model in products_list
         ]
         return {
             "wishlist_products": jsonable_encoder(wishlist_products)
         }
 
     async def set_by_customer_id(self, customer_id: str, wishlist: WishlistProductList) -> None:
-        customer = await self._get_customer_by_id(customer_id)
+        customer = await self.__get_customer_by_id(customer_id)
         if customer.wishlist_id is not None:
             wishlist_model = await self.wishlist_repository.get_by_id(customer.wishlist_id)
             if not wishlist_model:
@@ -103,7 +103,7 @@ class WishlistService:
 
         if customer.wishlist_id is None:
             wishlist_model = await self.wishlist_repository.create(
-                self._get_wishlist_name(customer)
+                self.__get_wishlist_name(customer)
             )
             customer.wishlist_id = wishlist_model.id
             await self.customer_repository.update(customer)
@@ -116,10 +116,10 @@ class WishlistService:
                 status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
             )
 
-        await self._add_products_to_wishlist(customer.wishlist_id, wishlist)
+        await self.__add_products_to_wishlist(customer.wishlist_id, wishlist)
 
     async def remove_by_customer_id(self, customer_id: str, wishlist: WishlistProductList) -> None:
-        customer = await self._get_customer_by_id(customer_id)
+        customer = await self.__get_customer_by_id(customer_id)
         if customer.wishlist_id is not None:
             wishlist_model = await self.wishlist_repository.get_by_id(customer.wishlist_id)
             if not wishlist_model:
