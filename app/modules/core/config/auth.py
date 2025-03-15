@@ -55,6 +55,7 @@ def create_access_token(subject: str) -> str:
         subject=subject
     )
 
+
 async def get_current_customer(
         db: AsyncSession = Depends(get_session),
         token: str = Depends(oauth2_schema)
